@@ -25,5 +25,26 @@
 int init();
 
 int i2c_read_2b(int fd, uint8_t dev_addr, uint8_t reg_addr, uint16_t *out);
+int i2c_read_1b(int fd, uint8_t dev_addr, uint8_t reg_addr, uint16_t *out);
+
+float get_gyro_x(int fd, uint8_t dev_addr);
+float get_gyro_z(int fd, uint8_t dev_addr);
+float get_gyro_z(int fd, uint8_t dev_addr);
+
+float get_accel_x(int fd, uint8_t dev_addr);
+float get_accel_z(int fd, uint8_t dev_addr);
+float get_accel_z(int fd, uint8_t dev_addr);
+
+float get_mag_x(int fd, uint8_t dev_addr);
+float get_mag_z(int fd, uint8_t dev_addr);
+float get_mag_z(int fd, uint8_t dev_addr);
+
+// no quaternion yet
+
+float get_euler_x(int fd, uint8_t dev_addr);
+float get_euler_z(int fd, uint8_t dev_addr);
+float get_euler_z(int fd, uint8_t dev_addr);
+
+
 
 #endif
