@@ -11,22 +11,21 @@
 #include <sys/ioctl.h>  // ioctl()
 #include <stdint.h>     // uint8_t, uint16_t
 
+// int init(){
+//     int file;
+//     int adapter_nr = 3; /* probably dynamically determined */
+//     char filename[20];
 
-int init(){
-    int file;
-    int adapter_nr = 3; /* probably dynamically determined */
-    char filename[20];
+//     snprintf(filename, 19, "/dev/i2c-%d", adapter_nr);
+//     file = open(filename, O_RDWR);
+//     if (file < 0) {
+//         /* ERROR HANDLING; you can check errno to see what went wrong */
+//         perror("Failed to open I2C bus. error:%d", file);
+//         return(-1);
+//     }
 
-    snprintf(filename, 19, "/dev/i2c-%d", adapter_nr);
-    file = open(filename, O_RDWR);
-    if (file < 0) {
-        /* ERROR HANDLING; you can check errno to see what went wrong */
-        perror("Failed to open I2C bus. error:%d", file);
-        return(-1);
-    }
-
-    return file;
-}
+//     return file;
+// }
 
 int i2c_read_2b(int fd, uint8_t dev_addr, uint8_t reg_addr, int16_t *out)
 {
@@ -163,7 +162,6 @@ float get_accel_z(int fd, uint8_t dev_addr){
     float z = raw / 100.0f;
     return z;
 }
-
 
 float get_mag_x(int fd, uint8_t dev_addr){
     int16_t* raw;

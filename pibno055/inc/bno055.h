@@ -1,26 +1,26 @@
 #ifndef BNO055_H
 #define BNO055_H
 
-#define GYRO_X_LSB
-#define GYRO_Y_LSB
-#define GYRO_Z_LSB
+#define GYRO_X_LSB 0x14
+#define GYRO_Y_LSB 0x16
+#define GYRO_Z_LSB 0x18
+ 
+#define ACCEL_X_LSB 0x8
+#define ACCEL_Y_LSB 0xA
+#define ACCEL_Z_LSB 0xC
 
-#define ACCEL_X_LSB
-#define ACCEL_Y_LSB
-#define ACCEL_Z_LSB
+#define MAG_X_LSB 0xE
+#define MAG_Y_LSB 0x10
+#define MAG_Z_LSB 0x12
 
-#define MAG_X_LSB
-#define MAG_Y_LSB
-#define MAG_Z_LSB
+#define QUAT_W_LSB 0x20
+#define QUAT_X_LSB 0x22
+#define QUAT_Y_LSB 0x24
+#define QUAT_Z_LSB 0x26
 
-#define QUAT_W_LSB
-#define QUAT_X_LSB
-#define QUAT_Y_LSB
-#define QUAT_Z_LSB
-
-#define EULER_X_LSB
-#define EULER_Y_LSB
-#define EULER_Z_LSB
+#define EULER_X_LSB 0x1A
+#define EULER_Y_LSB 0x1C
+#define EULER_Z_LSB 0x1E
 
 int init();
 
@@ -44,7 +44,4 @@ float get_mag_z(int fd, uint8_t dev_addr);
 float get_euler_x(int fd, uint8_t dev_addr);
 float get_euler_z(int fd, uint8_t dev_addr);
 float get_euler_z(int fd, uint8_t dev_addr);
-
-
-
 #endif
