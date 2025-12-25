@@ -1,13 +1,13 @@
 from setuptools import setup, Extension
 
 module = Extension(
-    'pibno055',
+    'pibno055._pibno055',
     sources=[
-        "pibno055/src/pibno55.c",
+        "pibno055/src/pibno055.c",
         "pibno055/src/bno055.c",
         "pibno055/src/imu_class.c"
     ],
-    include_dirs=["bno055/inc"]
+    include_dirs=["pibno055/inc"]
 )
 
 setup(

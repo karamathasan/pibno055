@@ -7,25 +7,27 @@
 #include <stdlib.h>
 #include <fcntl.h>      // open()
 #include <unistd.h>     // read(), write()
+#include <linux/i2c.h>
 #include <linux/i2c-dev.h>  // I2C_SLAVE
 #include <sys/ioctl.h>  // ioctl()
 #include <stdint.h>     // uint8_t, uint16_t
+// #include "../inc/bno055.h"
+#include "bno055.h"
 
-// int init(){
-//     int file;
-//     int adapter_nr = 3; /* probably dynamically determined */
-//     char filename[20];
+int get_fd(int adapter_nr){
+    int file;
+    char filename[20];
 
-//     snprintf(filename, 19, "/dev/i2c-%d", adapter_nr);
-//     file = open(filename, O_RDWR);
-//     if (file < 0) {
-//         /* ERROR HANDLING; you can check errno to see what went wrong */
-//         perror("Failed to open I2C bus. error:%d", file);
-//         return(-1);
-//     }
+    snprintf(filename, 19, "/dev/i2c-%d", adapter_nr);
+    file = open(filename, O_RDWR);
+    if (file < 0) {
+        /* ERROR HANDLING; you can check errno to see what went wrong */
+        perror("Failed to open I2C bus");
+        return(-1);
+    }
 
-//     return file;
-// }
+    return file;
+}
 
 int i2c_read_2b(int fd, uint8_t dev_addr, uint8_t reg_addr, int16_t *out)
 {
@@ -91,97 +93,153 @@ int i2c_read_1b(int fd, uint8_t dev_addr, uint8_t reg_addr, int16_t *out)
     return 0;
 }
 
+int i2c_write_2b(int fd, uint8_t dev_addr, uint8_t reg_addr, int16_t value)
+{
+    uint8_t buf[3] = { reg_addr, value & 0xFF, (value >> 8) & 0xFF };
+
+    struct i2c_msg msg = {
+        .addr  = dev_addr,
+        .flags = 0,      // 0 for write
+        .len   = 3,
+        .buf   = buf
+    };
+
+    struct i2c_rdwr_ioctl_data ioctl_data = {
+        .msgs  = &msg,
+        .nmsgs = 1
+    };
+
+    if (ioctl(fd, I2C_RDWR, &ioctl_data) < 0) {
+        perror("I2C_RDWR");
+        return -1;
+    }
+
+    return 0;
+}
+
+int i2c_write_1b(int fd, uint8_t dev_addr, uint8_t reg_addr, int16_t value)
+{
+    uint8_t buf[2] = { reg_addr, value };
+
+    struct i2c_msg msg = {
+        .addr  = dev_addr,
+        .flags = 0,      // 0 for write
+        .len   = 2,
+        .buf   = buf
+    };
+
+    struct i2c_rdwr_ioctl_data ioctl_data = {
+        .msgs  = &msg,
+        .nmsgs = 1
+    };
+
+    if (ioctl(fd, I2C_RDWR, &ioctl_data) < 0) {
+        perror("I2C_RDWR");
+        return -1;
+    }
+
+    return 0;
+}
+
+int set_mode(int fd, uint8_t addr, uint8_t mode) {
+    return i2c_write_1b(fd, addr, OPR_MODE, mode);
+}
+
+// int8_t set_units(int fd, uint8_t addr, uint8_t units) {
+//     return i2c_write_1b(fd, addr, 0x3B, units);
+// }
+
 float get_euler_x(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, EULER_X_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, EULER_X_LSB, &raw);
 
     float x = raw / 16.0f;
     return x;
 }
 
 float get_euler_y(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, EULER_Y_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, EULER_Y_LSB, &raw);
 
     float y = raw / 16.0f;
     return y;
 }
 
 float get_euler_z(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, EULER_Z_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, EULER_Z_LSB, &raw);
 
     float z = raw / 16.0f;
     return z;
 }
 
 float get_gyro_x(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, GYRO_X_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, GYRO_X_LSB, &raw);
 
     float x = raw / 16.0f;
     return x;
 }
 
 float get_gyro_y(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, GYRO_Y_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, GYRO_Y_LSB, &raw);
 
     float y = raw / 16.0f;
     return y;
 }
 
 float get_gyro_z(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, GYRO_Z_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, GYRO_Z_LSB, &raw);
 
     float z = raw / 16.0f;
     return z;
 }
 
 float get_accel_x(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, ACCEL_X_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, ACCEL_X_LSB, &raw);
 
     float x = raw / 100.0f;
     return x;
 }
 
 float get_accel_y(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, ACCEL_Y_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, ACCEL_Y_LSB, &raw);
 
     float y = raw / 100.0f;
     return y;
 }
 
 float get_accel_z(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, ACCEL_Z_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, ACCEL_Z_LSB, &raw);
 
     float z = raw / 100.0f;
     return z;
 }
 
 float get_mag_x(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, MAG_X_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, MAG_X_LSB, &raw);
 
     float x = raw / 16.0;
     return x;
 }
 
 float get_mag_y(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, MAG_Y_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, MAG_Y_LSB, &raw);
 
     float y = raw / 16.0;
     return y;
 }
 
 float get_mag_z(int fd, uint8_t dev_addr){
-    int16_t* raw;
-    i2c_read_2b(fd, dev_addr, MAG_Z_LSB, raw)
+    int16_t raw;
+    i2c_read_2b(fd, dev_addr, MAG_Z_LSB, &raw);
 
     float z = raw / 16.0;
     return z;
